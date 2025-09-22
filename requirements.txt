@@ -7,6 +7,7 @@ charset-normalizer==3.4.3
 coverage==7.10.7
 Django==5.2.6
 djangorestframework==3.16.1
+djangorestframework_simplejwt==5.5.1
 filelock==3.19.1
 fsspec==2025.9.0
 google-auth==2.40.3
@@ -32,6 +33,7 @@ pyasn1_modules==0.4.2
 pydantic==2.11.9
 pydantic_core==2.33.2
 Pygments==2.19.2
+PyJWT==2.10.1
 pytest==8.4.2
 pytest-cov==7.0.0
 pytest-django==4.11.1
