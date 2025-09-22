@@ -17,13 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from app_auth.api.views import RegistrationView, LoginView, CookieTokenRefreshView, LogoutView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # path('api/register/', RegistrationView.as_view(), name=""),
-    # path('api/login/', LoginView.as_view(), name=""),
-    # path('api/logout/', LogoutView.as_view(), name=""),
-    # path('api/token/refresh/', TokenRefresh.as_view(), name="")
+    path('api/register/', RegistrationView.as_view(), name=""),
+    path('api/login/', LoginView.as_view(), name=""),
+    path('api/logout/', LogoutView.as_view(), name=""),
+    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name="")
 
     # path('api/createQuiz/', CreateQuizView.as_view(), name=""),
 
