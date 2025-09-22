@@ -92,7 +92,12 @@ class CookieTokenRefreshView(TokenRefreshView):
         
         access_token = serializer.validated_data.get("access")
 
-        response = Response({"message":"Token refreshed"})
+        response = Response(
+            {
+                "detail":"Token refreshed",
+                "access": access_token
+            }
+        )
 
         response.set_cookie(
             key = "access_token",
@@ -109,7 +114,11 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        response = Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
+        
+        response = Response(
+            {"detail": "Log-Out successfully! All Tokens will be deleted. Refresh token is now invalid."},
+            status=status.HTTP_200_OK
+        )
         
         # delete cookies
         response.delete_cookie('access_token')
