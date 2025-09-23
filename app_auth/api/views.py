@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from .serializers import RegistrationSerializer
+from .serializers import RegistrationSerializer, LoginSerializer
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -26,6 +26,7 @@ class RegistrationView(APIView):
         
 
 class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
 
