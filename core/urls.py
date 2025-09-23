@@ -25,7 +25,9 @@ urlpatterns = [
     path('api/register/', RegistrationView.as_view(), name=""),
     path('api/login/', LoginView.as_view(), name=""),
     path('api/logout/', LogoutView.as_view(), name=""),
-    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name="")
+    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name=""),
+    
+    path('api/', include('app_quiz.api.urls'))
 
     # path('api/createQuiz/', CreateQuizView.as_view(), name=""),
 
