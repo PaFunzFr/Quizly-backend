@@ -1,14 +1,18 @@
 from rest_framework import views, status
+from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .serializers import QuizCreateSerializer
+from .permissions import IsOwnerStaffOrAdmin
+from .serializers import QuizSerializer, QuizDetailSerializer
 from .tasks import download_and_transcribe, generateQuiz
 from app_quiz.models import Quiz, Question
 
 # from threading import Thread
 
 class QuizCreateView(views.APIView):
-    serializer_class = QuizCreateSerializer
+    serializer_class = QuizSerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -54,3 +58,22 @@ class QuizCreateView(views.APIView):
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class QuizListView(generics.ListAPIView):
+    serializer_class = QuizSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Quiz.objects.filter(owner = user)
+        return queryset
+
+
+class QuizDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = QuizDetailSerializer
+    permission_classes = [IsAuthenticated, IsOwnerStaffOrAdmin]
+
+    def get_queryset(self):
+        user = self.request.user
+        pk = self.kwargs['pk']
+        queryset = Quiz.objects.filter(pk=pk, owner = user)
+        return queryset

@@ -15,7 +15,7 @@ class QuestionNestedSerializer(serializers.ModelSerializer):
             'updated_at'
         ]
 
-class QuizCreateSerializer(serializers.ModelSerializer):
+class QuizSerializer(serializers.ModelSerializer):
     questions = QuestionNestedSerializer(many=True, read_only=True)
     class Meta:
         model = Quiz
@@ -55,3 +55,17 @@ class QuizCreateSerializer(serializers.ModelSerializer):
 
         # return normalized youtube url
         return f"https://www.youtube.com/watch?v={video_id}"
+    
+class QuizDetailSerializer(QuizSerializer):
+    class Meta:
+        model = Quiz
+        fields = [
+            'id',
+            'title',
+            'description',
+            'created_at',
+            'updated_at',
+            'video_url',
+            'questions'
+        ]
+        read_only_fields = ["id", "created_at", "updated_at", "questions"]
