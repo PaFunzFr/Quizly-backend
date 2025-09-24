@@ -2,7 +2,8 @@ from rest_framework import views, status
 from rest_framework.response import Response
 
 from .serializers import QuizCreateSerializer
-from .tasks import download_and_transcribe, createQuiz
+from .tasks import download_and_transcribe, generateQuiz
+from app_quiz.models import Quiz, Question
 
 # from threading import Thread
 
@@ -14,18 +15,31 @@ class QuizCreateView(views.APIView):
         if serializer.is_valid():
             url = serializer.validated_data['video_url']
             transcript_text = download_and_transcribe(url)
-            quiz_str = createQuiz(transcript_text)
+            quiz_str = generateQuiz(transcript_text)
 
             import json
             try:
                 quiz_json = json.loads(quiz_str)
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 return Response(
                     {"error": "Invalid JSON returned from Gemini", "raw": quiz_str},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-            
-            return Response(quiz_json, status=status.HTTP_200_OK)
+
+            quiz = Quiz.objects.create(
+                owner=request.user,
+                title=quiz_json.get("title", "No title set")[:80],
+                description=quiz_json.get("description", "No Description set")[:200],
+                video_url=serializer.validated_data["video_url"],
+            )
+            for q in quiz_json["questions"]:
+                Question.objects.create(
+                    quiz=quiz,
+                    question_title=q["question_title"][:200],
+                    question_options=q["question_options"],
+                    answer=q["answer"][:200],
+                )
+            return Response(self.serializer_class(quiz).data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

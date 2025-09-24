@@ -22,6 +22,7 @@ from app_auth.api.views import RegistrationView, LoginView, CookieTokenRefreshVi
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    path('api-auth/', include('rest_framework.urls')),
     path('api/register/', RegistrationView.as_view(), name=""),
     path('api/login/', LoginView.as_view(), name=""),
     path('api/logout/', LogoutView.as_view(), name=""),

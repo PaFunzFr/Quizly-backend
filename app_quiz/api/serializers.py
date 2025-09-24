@@ -28,6 +28,7 @@ class QuizCreateSerializer(serializers.ModelSerializer):
             'video_url',
             'questions'
         ]
+        read_only_fields = ["id", "title", "description", "created_at", "updated_at", "questions"]
 
     def validate_video_url(self, value):
 
