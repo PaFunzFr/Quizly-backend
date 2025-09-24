@@ -76,7 +76,7 @@ def clean_json(text: str) -> str:
 
 def generateQuiz(transcript):
     response = client.models.generate_content(
-        model='gemini-2.0-flash-001',
+        model='gemini-2.5-flash-lite', #'gemini-2.0-flash-001',
         contents=[prompt, transcript]
     )
     quiz_raw = response.candidates[0].content.parts[0].text
