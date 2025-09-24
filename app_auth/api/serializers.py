@@ -14,16 +14,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'email', 'password', 'repeated_password']
         extra_kwargs = {
-            'username': {'read_only': True},
             'password': {'write_only': True},
             'email': {'required': True},
+            # 'username' : {read_only: True}
         }
 
-    def validate_repeated_password(self, value):
-        password = self.initial_data.get('password')
-        if password and value and password != value:
-            raise serializers.ValidationError('Passwords do not match')
-        return value
+    def validate(self, attrs):
+        if attrs.get("password") != attrs.get("repeated_password"):
+            raise serializers.ValidationError({"repeated_password": "Passwords do not match"})
+        return attrs
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
@@ -32,42 +31,50 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def save(self):
         pw = self.validated_data['password']
+        self.validated_data.pop("repeated_password")
         email = self.validated_data['email']
+        username = self.validated_data['username']
 
         # user specific part of email and clean it up
-        local_part = email.split('@')[0]
-        clean_part = re.sub(r'[^a-zA-Z0-9]', '', local_part)
+        # if not username:
+        #     local_part = email.split('@')[0]
+        #     clean_part = re.sub(r'[^a-zA-Z0-9]', '', local_part)
+        #     if not clean_part:
+        #         clean_part = "user"
+        #     count = User.objects.count() + 1
 
-        count = User.objects.count() + 1
-        # generated username extracted from email
-        gen_username = f"{clean_part}{count}"
-        account = User(
+            # generated username extracted from email
+            # username = f"{clean_part}{count}"
+
+        return User.objects.create_user(
+            username=username,
             email=email,
-            username=gen_username
+            password=pw
         )
-        account.set_password(pw)
-        account.save()
-        return account
 
 
 class LoginSerializer(TokenObtainPairSerializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
+    #email = serializers.EmailField() # Login with email and password
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True) # change with email
 
-    """ make username unrequired """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    # needed for email login
+    # """ make username unrequired """
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
 
-        if "username"in self.fields:
-            self.fields.pop("username")
+    #     if "username"in self.fields:
+    #         self.fields.pop("username")
 
 
     def validate(self, attrs):
-        email = attrs.get("email")
-        password = attrs.get("password")
+        #email = attrs.get("email") # login with email and password
+        username = attrs.get("username")
+        password = attrs.get("password") # change with email
 
         try:
-            user = User.objects.get(email=email)
+            # user = User.objects.get(email=email) # login with email and password
+            user = User.objects.get(username=username) # change with email
         except User.DoesNotExist:
             raise serializers.ValidationError("Invalid User or Password")
 

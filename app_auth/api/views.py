@@ -42,7 +42,7 @@ class LoginView(TokenObtainPairView):
 
         response = Response(
             {
-            "detail":"Login successful",
+            "detail":"Login successfully!",
             "user": {
                     "id": user.pk,
                     "username": user.username,
@@ -55,6 +55,7 @@ class LoginView(TokenObtainPairView):
             key = "access_token",
             value = str(access),
             httponly = True,
+            #secure = False, # Dev
             secure = True,
             samesite = "Lax"
         )
@@ -63,6 +64,7 @@ class LoginView(TokenObtainPairView):
             key = "refresh_token",
             value = str(refresh),
             httponly = True,
+            #secure = False, # Dev
             secure = True,
             samesite = "Lax"
         )
@@ -104,6 +106,7 @@ class CookieTokenRefreshView(TokenRefreshView):
             key = "access_token",
             value = access_token,
             httponly = True,
+            #secure = False, # Dev
             secure = True,
             samesite = "Lax"
         )
