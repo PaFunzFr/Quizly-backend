@@ -12,7 +12,8 @@ COPY requirements.txt ./
 
 RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-RUN python -c "import whisper; whisper.load_model('base')"
+# RUN python -c "import whisper; whisper.load_model('base')"
+RUN python -c "import whisper; whisper.load_model('tiny')"
 
 # copy all
 COPY . . 
