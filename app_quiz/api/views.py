@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .permissions import IsOwnerStaffOrAdmin
 from .serializers import QuizSerializer, QuizDetailSerializer
-from .tasks import download_and_transcribe, generateQuiz
+from .utils import download_and_transcribe, generateQuiz
 from app_quiz.models import Quiz, Question
 
 # from threading import Thread

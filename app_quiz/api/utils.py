@@ -42,7 +42,8 @@ ydl_opts = {
     'format': 'm4a/bestaudio/best',
     "quiet": True,
     "noplaylist": True,
-    'outtmpl': '%(id)s.%(ext)s' # save file as "VIDEO_ID.m4a"
+    'outtmpl': '%(id)s.%(ext)s', # save file as "VIDEO_ID.m4a"
+    'progress_hooks': []
     # 'postprocessors': [{  # Extract audio using ffmpeg
     #     'key': 'FFmpegExtractAudio',
     #     'preferredcodec': 'm4a',
