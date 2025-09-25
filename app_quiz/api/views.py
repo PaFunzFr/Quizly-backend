@@ -9,7 +9,6 @@ from .utils import download_and_transcribe, generateQuiz
 from app_quiz.models import Quiz, Question
 
 from app_auth.api.views import CookieJWTAuthentication
-# from threading import Thread
 
 class QuizCreateView(views.APIView):
     serializer_class = QuizSerializer
@@ -48,16 +47,6 @@ class QuizCreateView(views.APIView):
             return Response(self.serializer_class(quiz).data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    # def post(self, request):
-    #     serializer = self.serializer_class(data=request.data)
-    #     if serializer.is_valid():
-    #         quiz = serializer.save()
-    #         url = serializer.validated_data['video_url']
-    #         t = Thread(target=download_and_transcribe, args=(url,))
-    #         t.start()
-    #         return Response({"status": "Task gestartet"}, status=status.HTTP_202_ACCEPTED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class QuizListView(generics.ListAPIView):

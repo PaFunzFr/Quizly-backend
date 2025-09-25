@@ -5,6 +5,16 @@ import json
 from unittest.mock import patch
 from contextlib import ExitStack
 
+
+def test_create_quiz_requires_authentication(api_client):
+    url = reverse("create-quiz")
+    payload = {"url": "https://www.youtube.com/watch?v=anyId"}
+
+    response = api_client.post(url, payload, format="json")
+
+    assert response.status_code == 401
+    
+
 def test_create_quiz_invalid_url(auth_client):
     url = reverse("create-quiz")
     payload = {"url": "https://example.com/video"}
