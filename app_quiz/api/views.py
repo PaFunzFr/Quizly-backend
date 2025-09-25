@@ -75,9 +75,4 @@ class QuizDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = QuizDetailSerializer
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerStaffOrAdmin]
-
-    def get_queryset(self):
-        user = self.request.user
-        pk = self.kwargs['pk']
-        queryset = Quiz.objects.filter(pk=pk, owner = user)
-        return queryset
+    queryset = Quiz.objects.all()
