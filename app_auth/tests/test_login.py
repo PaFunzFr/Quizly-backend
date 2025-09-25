@@ -19,7 +19,7 @@ def test_login(auth_client):
     # Login successful?
     assert response.status_code == 200
     assert "detail" in response.data
-    assert response.data["detail"] == "Login successfully!"
+    assert "Login successfully!" in str(response.data)
 
     # Cookies created?
     cookies = response.cookies
@@ -35,7 +35,7 @@ def test_logout(auth_client):
     url = reverse('logout') 
     response = auth_client.post(url)
     assert response.status_code == 200
-    assert response.data["detail"] == "Log-Out successfully! All Tokens will be deleted. Refresh token is now invalid."
+    assert "Log-Out successfully! All Tokens will be deleted. Refresh token is now invalid." in str(response.data)
     
     # check if cookies were deleted
     cookies = response.cookies

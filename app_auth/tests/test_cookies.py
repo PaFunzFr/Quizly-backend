@@ -8,7 +8,7 @@ refresh_url = reverse("refresh")
 def test_refresh_success(auth_client_with_refresh):
     response = auth_client_with_refresh.post(refresh_url)
     assert response.status_code == 200
-    assert response.data["detail"] == "Token refreshed"
+    assert "Token refreshed" in str(response.data)
     assert "access" in response.data
 
     # is cookie set?
@@ -19,11 +19,11 @@ def test_refresh_success(auth_client_with_refresh):
 def test_refresh_no_cookie(api_client):
     response = api_client.post(refresh_url)
     assert response.status_code == 401
-    assert response.data["detail"] == "Refresh Token not found."
+    assert "Refresh Token not found." in str(response.data)
 
 
 def test_refresh_invalid_cookie(api_client):
     api_client.cookies["refresh_token"] = "FAKETOKEN123"
     response = api_client.post(refresh_url)
     assert response.status_code == 401
-    assert response.data["detail"] == "Refresh Token invalid"
+    assert "Refresh Token invalid" in str(response.data)

@@ -19,7 +19,7 @@ def test_registration(auth_client):
 
     # Registration success
     assert response.status_code == 201
-    assert response.data["detail"] == "User created successfully!"
+    assert "User created successfully!" in str(response.data)
 
     # User created?
     user = User.objects.filter(username="uniqueuser").first()

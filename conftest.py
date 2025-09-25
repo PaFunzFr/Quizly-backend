@@ -41,3 +41,25 @@ def auth_client_with_refresh(test_user):
     refresh = RefreshToken.for_user(test_user)
     client.cookies["refresh_token"] = str(refresh)
     return client
+
+
+@pytest.fixture
+def quiz_dummy():
+    dummy_json = {
+        "title": "Test Quiz",
+        "description": "This is a dummy quiz for testing purposes.",
+        "video_url": "https://www.youtube.com/watch?v=validId",
+        "questions": [
+            {
+                "question_title": f"Test question {i+1}?",
+                "question_options": [
+                    "Option A",
+                    "Option B",
+                    "Option C",
+                    "Option D"
+                ],
+                "answer": "Option A"
+            } for i in range(10)
+        ]
+    }
+    return dummy_json
