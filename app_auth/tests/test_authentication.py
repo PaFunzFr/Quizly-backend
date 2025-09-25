@@ -15,11 +15,9 @@ def test_user(db):
     )
     return user
 
-
 @pytest.fixture
 def api_client():
     return APIClient()
-
 
 @pytest.fixture
 def token_pair(test_user):
@@ -34,6 +32,36 @@ def auth_client(api_client, token_pair):
     api_client.cookies["refresh_token"] = token_pair["refresh"]
     return api_client
 
+@pytest.fixture
+def auth_client_with_refresh(test_user):
+    client = APIClient()
+    refresh = RefreshToken.for_user(test_user)
+    client.cookies["refresh_token"] = str(refresh)
+    return client
+
+
+def test_registration(auth_client):
+    url = reverse('register')
+    payload = {
+        "username": "uniqueuser",
+        "password": "Password123",
+        "confirmed_password": "Password123",
+        "email": "unique@example.com"
+    }
+    response = auth_client.post(
+        url,
+        payload,
+        format="json"
+    )
+
+    # Registration success
+    assert response.status_code == 201
+    assert response.data["detail"] == "User created successfully!"
+
+    # User created?
+    user = User.objects.filter(username="uniqueuser").first()
+    assert user is not None
+    assert user.email == "unique@example.com"
 
 
 def test_login(auth_client):
@@ -77,3 +105,27 @@ def test_logout(auth_client):
 
     assert cookies["access_token"]["max-age"] == 0
     assert cookies["refresh_token"]["max-age"] == 0
+
+
+def test_refresh_success(auth_client_with_refresh):
+    response = auth_client_with_refresh.post("/api/token/refresh/")
+    assert response.status_code == 200
+    assert response.data["detail"] == "Token refreshed"
+    assert "access" in response.data
+
+    # is cookie set?
+    assert "access_token" in response.cookies
+    assert response.cookies["access_token"].value != ""
+
+
+def test_refresh_no_cookie(api_client):
+    response = api_client.post("/api/token/refresh/")
+    assert response.status_code == 401
+    assert response.data["detail"] == "Refresh Token not found."
+
+
+def test_refresh_invalid_cookie(api_client):
+    api_client.cookies["refresh_token"] = "FAKETOKEN123"
+    response = api_client.post("/api/token/refresh/")
+    assert response.status_code == 401
+    assert response.data["detail"] == "Refresh Token invalid"
