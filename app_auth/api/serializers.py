@@ -8,11 +8,16 @@ User = get_user_model()
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    repeated_password = serializers.CharField(write_only=True)
+    confirmed_password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'repeated_password']
+        fields = [
+            'username',
+            'email',
+            'password',
+            'confirmed_password'
+            ]
         extra_kwargs = {
             'password': {'write_only': True},
             'email': {'required': True},
@@ -20,8 +25,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs):
-        if attrs.get("password") != attrs.get("repeated_password"):
-            raise serializers.ValidationError({"repeated_password": "Passwords do not match"})
+        if attrs.get("password") != attrs.get("confirmed_password"):
+            raise serializers.ValidationError({"confirmed_password": "Passwords do not match"})
         return attrs
 
     def validate_email(self, value):
@@ -29,11 +34,21 @@ class RegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Email already used')
         return value
 
-    def save(self):
-        pw = self.validated_data['password']
-        self.validated_data.pop("repeated_password")
-        email = self.validated_data['email']
-        username = self.validated_data['username']
+
+    def create(self, validated_data):
+        user = User(
+            username=validated_data['username'],
+            email=validated_data['email']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+    
+    # def save(self):
+    #     pw = self.validated_data['password']
+    #     self.validated_data.pop("confirmed_password")
+    #     email = self.validated_data['email']
+    #     username = self.validated_data['username']
 
         # user specific part of email and clean it up
         # if not username:
@@ -46,11 +61,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
             # generated username extracted from email
             # username = f"{clean_part}{count}"
 
-        return User.objects.create_user(
-            username=username,
-            email=email,
-            password=pw
-        )
+        # return User.objects.create_user(
+        #     username=username,
+        #     email=email,
+        #     password=pw
+        # )
+    
+
 
 
 class LoginSerializer(TokenObtainPairSerializer):

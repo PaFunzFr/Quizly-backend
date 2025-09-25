@@ -8,16 +8,18 @@ from .serializers import QuizSerializer, QuizDetailSerializer
 from .utils import download_and_transcribe, generateQuiz
 from app_quiz.models import Quiz, Question
 
+from app_auth.api.views import CookieJWTAuthentication
 # from threading import Thread
 
 class QuizCreateView(views.APIView):
     serializer_class = QuizSerializer
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            url = serializer.validated_data['video_url']
+            url = serializer.validated_data['url']
             transcript_text = download_and_transcribe(url)
             quiz_str = generateQuiz(transcript_text)
 
@@ -34,7 +36,7 @@ class QuizCreateView(views.APIView):
                 owner=request.user,
                 title=quiz_json.get("title", "No title set")[:80],
                 description=quiz_json.get("description", "No Description set")[:200],
-                video_url=serializer.validated_data["video_url"],
+                video_url=url,
             )
             for q in quiz_json["questions"]:
                 Question.objects.create(
@@ -60,6 +62,7 @@ class QuizCreateView(views.APIView):
 
 class QuizListView(generics.ListAPIView):
     serializer_class = QuizSerializer
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -70,6 +73,7 @@ class QuizListView(generics.ListAPIView):
 
 class QuizDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = QuizDetailSerializer
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerStaffOrAdmin]
 
     def get_queryset(self):

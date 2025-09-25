@@ -17,6 +17,7 @@ class QuestionNestedSerializer(serializers.ModelSerializer):
 
 class QuizSerializer(serializers.ModelSerializer):
     questions = QuestionNestedSerializer(many=True, read_only=True)
+    url = serializers.URLField(write_only=True)
     class Meta:
         model = Quiz
         fields = [
@@ -26,11 +27,12 @@ class QuizSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'video_url',
-            'questions'
+            'questions',
+            'url'
         ]
-        read_only_fields = ["id", "title", "description", "created_at", "updated_at", "questions"]
+        read_only_fields = ["id", "title", "video_url", "description", "created_at", "updated_at", "questions"]
 
-    def validate_video_url(self, value):
+    def validate_url(self, value):
 
         if not value:
             raise serializers.ValidationError("Video URL cannot be empty.")
