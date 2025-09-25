@@ -23,10 +23,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('api-auth/', include('rest_framework.urls')),
-    path('api/register/', RegistrationView.as_view(), name=""),
-    path('api/login/', LoginView.as_view(), name=""),
-    path('api/logout/', LogoutView.as_view(), name=""),
-    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name=""),
+    path('api/register/', RegistrationView.as_view(), name="register"),
+    path('api/login/', LoginView.as_view(), name="login"),
+    path('api/logout/', LogoutView.as_view(), name="logout"),
+    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name="refresh"),
     
     path('api/', include('app_quiz.api.urls'))
 
