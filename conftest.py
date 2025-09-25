@@ -14,6 +14,15 @@ def test_user(db):
     )
     return user
 
+@pytest.fixture
+def other_user_as_quiz_owner():
+    user = User.objects.create_user(
+        username="other",
+        email="other@example.com",
+        password="Password123"
+    )
+    return user
+
 
 @pytest.fixture
 def api_client():

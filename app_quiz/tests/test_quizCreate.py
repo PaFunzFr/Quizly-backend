@@ -13,7 +13,7 @@ def test_create_quiz_requires_authentication(api_client):
     response = api_client.post(url, payload, format="json")
 
     assert response.status_code == 401
-    
+
 
 def test_create_quiz_invalid_url(auth_client):
     url = reverse("create-quiz")
@@ -45,9 +45,9 @@ def test_create_quiz_invalid_json(auth_client):
 
 
 
-def test_create_quiz_invalid_url(auth_client, test_user, quiz_dummy):
+def test_create_quiz_valid_url(auth_client, test_user, quiz_dummy):
     url = reverse("create-quiz")
-    payload = {"url": "https://www.youtube.com/watch?v=iQqCAQ8hG_Y"}
+    payload = {"url": "https://www.youtube.com/watch?v=validId"}
     quiz_dummy_str = json.dumps(quiz_dummy)
 
     with ExitStack() as stack:
