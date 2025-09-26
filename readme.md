@@ -82,6 +82,21 @@ Make sure to replace placeholders with your actual keys.
 
 ---
 
+## Requirements
+
+- Python 3.13+
+- FFmpeg (für yt-dlp/Whisper)
+
+- Core dependencies:
+    - Django 5, Django REST Framework, SimpleJWT
+    - django-cors-headers, drf-spectacular
+    - yt-dlp, openai-whisper/ctranslate2/onnxruntime (ASR)
+    - google-genai (Quiz-Generierung)
+
+full list: requirements.txt (Installation guide see below)
+
+---
+
 ## Install Dependencies
 
 All required Python packages are listed in requirements.txt.
@@ -116,7 +131,8 @@ Source code is mounted to /usr/src/app for live updates.
 
 ## Manual Run (without Docker)
 
-```python -m venv venv
+```
+python -m venv venv
 source venv/bin/activate  # Linux / Mac
 venv\Scripts\activate     # Windows
 ```
