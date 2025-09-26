@@ -16,9 +16,6 @@ With this API you can create Quizes from Youtube Video URLs.
 
 ## Project Structure
 
-
-## Project Structure
-
 ```
 backend-quizly/
 │
@@ -154,10 +151,14 @@ python manage.py migrate
 Tests are written using pytest and pytest-django.
 
 # Run all tests
-```pytest```
+```
+pytest
+```
 
 # Run with coverage report
-```pytest --cov=.```
+```
+pytest --cov=.`
+``
 
 The test fixtures use pre-created users, JWT tokens, and dummy quizzes. Make sure your .env is properly set up before running tests.
 
