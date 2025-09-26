@@ -70,4 +70,13 @@ class QuizDetailSerializer(QuizSerializer):
             'video_url',
             'questions'
         ]
-        read_only_fields = ["id", "created_at", "updated_at", "questions"]
+        read_only_fields = ["id", "created_at", "updated_at", "questions", "video_url"]
+
+    def validate(self, attrs):
+        forbidden_fields = ["video_url", "questions", "id"]
+        for field in forbidden_fields:
+            if field in self.initial_data:
+                raise serializers.ValidationError(
+                    {field: "This field cannot be updated."}
+                )
+        return super().validate(attrs)
