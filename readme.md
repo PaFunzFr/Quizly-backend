@@ -61,7 +61,7 @@ backend-quizly/
 ├── docker-compose.yml
 ├── requirements.txt
 ├── manage.py
-├── conftest.py                        # falls du ALLE Fixtures zentral hier halten willst (alternativ im tests/)
+├── conftest.py                        
 ├── pytest.ini
 └── .env
 ```
@@ -74,7 +74,7 @@ Create a .env file in the root folder with the following variables:
 
 ```
 SECRET_KEY=' placeholder'
-DEBUG= True / False
+DEBUG= True
 GEMINI_API_KEY= 'placeholder'
 ```
 
@@ -110,25 +110,6 @@ pip install -r requirements.txt
 
 ---
 
-## Docker Setup
-
-Build Docker Image
-
-```docker build -tag coderr-backend .```
-
-This will also pre-load the Whisper tiny model.
-
----
-
-## Run Using Docker Compose
-
-```docker-compose up --build```
-
-The backend will be exposed on http://localhost:8000.
-Source code is mounted to /usr/src/app for live updates.
-
----
-
 ## Manual Run (without Docker)
 
 ```
@@ -146,6 +127,25 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 ```
+
+---
+
+## Docker Setup
+
+Build Docker Image
+
+```docker build -tag coderr-backend .```
+
+This will also pre-load the Whisper tiny model.
+
+---
+
+## Run Using Docker Compose
+
+```docker-compose up --build```
+
+The backend will be exposed on http://localhost:8000.
+Source code is mounted to /usr/src/app for live updates.
 
 ---
 
