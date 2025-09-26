@@ -174,7 +174,7 @@ pytest
 # Run with coverage report
 ```
 pytest --cov=.`
-``
+```
 
 The test fixtures use pre-created users, JWT tokens, and dummy quizzes. Make sure your .env is properly set up before running tests.
 
