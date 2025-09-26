@@ -4,6 +4,15 @@ from django.urls import reverse
 User = get_user_model()
 
 def test_registration(auth_client):
+    """
+    Test the user registration endpoint for successful account creation.
+
+    This test verifies that:
+    - The response status code is 201 (Created).
+    - The response contains a success message indicating the user was created.
+    - A new user is actually created in the database with the expected username and email.
+    """
+
     url = reverse('register')
     payload = {
         "username": "uniqueuser",
@@ -11,11 +20,7 @@ def test_registration(auth_client):
         "confirmed_password": "Password123",
         "email": "unique@example.com"
     }
-    response = auth_client.post(
-        url,
-        payload,
-        format="json"
-    )
+    response = auth_client.post(url, payload, format="json")
 
     # Registration success
     assert response.status_code == 201

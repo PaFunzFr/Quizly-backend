@@ -5,16 +5,22 @@ User = get_user_model()
 
 
 def test_login(auth_client):
+    """
+    Test the user login endpoint for successful authentication and cookie creation.
+
+    This test verifies that:
+    - The response status code is 200 (OK).
+    - The response contains a success message indicating login was successful.
+    - Both 'access_token' and 'refresh_token' cookies are created.
+    - The cookies contain non-empty JWT tokens.
+    """
+
     url = reverse('login') 
     payload = {
         "username": "testuser",
         "password": "Password123"
     }
-    response = auth_client.post(
-        url,
-        payload,
-        format="json"
-    )
+    response = auth_client.post(url, payload, format="json")
 
     # Login successful?
     assert response.status_code == 200
@@ -32,8 +38,19 @@ def test_login(auth_client):
 
 
 def test_logout(auth_client):
+    """
+    Test the user logout endpoint for successful token invalidation and cookie deletion.
+
+    This test verifies that:
+    - The response status code is 200 (OK).
+    - The response contains a success message indicating logout.
+    - Both 'access_token' and 'refresh_token' cookies are deleted.
+    - The cookies' values are empty and their max-age is set to 0.
+    """
+
     url = reverse('logout') 
     response = auth_client.post(url)
+    
     assert response.status_code == 200
     assert "Log-Out successfully! All Tokens will be deleted. Refresh token is now invalid." in str(response.data)
     

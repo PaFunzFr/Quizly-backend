@@ -1,15 +1,17 @@
 from rest_framework import status
+from rest_framework import exceptions
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from .serializers import RegistrationSerializer, LoginSerializer
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework import exceptions
+
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 class CookieJWTAuthentication(JWTAuthentication):
+    """Authenticate user via JWT stored in cookies."""
     def authenticate(self, request):
         access_token = request.COOKIES.get("access_token")
         if not access_token:
@@ -20,15 +22,24 @@ class CookieJWTAuthentication(JWTAuthentication):
         except Exception:
             raise exceptions.AuthenticationFailed("Invalid token")
         
-
+@extend_schema(
+    description="Register a new user.",
+    request=RegistrationSerializer,
+    responses={
+        201: OpenApiResponse(description="User created successfully."),
+        400: OpenApiResponse(description="Invalid registration data."),
+    }
+)
 class RegistrationView(APIView):
+    """User registration endpoint."""
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
 
         if serializer.is_valid():
-            user = serializer.save() 
+            """Create a new user account."""
+            serializer.save() 
             return Response(
                 {"detail": "User created successfully!"},
                 status = status.HTTP_201_CREATED
@@ -40,12 +51,21 @@ class RegistrationView(APIView):
                 )
         
 
+@extend_schema(
+    description="Login with username and password. Returns JWT tokens and user info.",
+    request=LoginSerializer,
+    responses={
+        200: OpenApiResponse(description="Login successful. Tokens set in cookies."),
+        401: OpenApiResponse(description="Invalid credentials."),
+    }
+)
 class LoginView(TokenObtainPairView):
+    """User login endpoint using JWT."""
     serializer_class = LoginSerializer
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-
+        """Authenticate user and set JWT cookies."""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -71,7 +91,6 @@ class LoginView(TokenObtainPairView):
             key = "access_token",
             value = str(access),
             httponly = True,
-            #secure = False, # Dev
             secure = True,
             samesite = "Lax"
         )
@@ -80,19 +99,26 @@ class LoginView(TokenObtainPairView):
             key = "refresh_token",
             value = str(refresh),
             httponly = True,
-            #secure = False, # Dev
             secure = True,
             samesite = "Lax"
         )
 
         return response
     
-    
-class CookieTokenRefreshView(TokenRefreshView):
 
+@extend_schema(
+    description="Refresh access token using refresh token stored in cookies.",
+    responses={
+        200: OpenApiResponse(description="Access token refreshed."),
+        401: OpenApiResponse(description="Refresh token missing or invalid."),
+    }
+)
+class CookieTokenRefreshView(TokenRefreshView):
+    """Refresh JWT access token via cookie."""
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh_token")
 
+        """Refresh access token."""
         if refresh_token is None:
             return Response(
                 {"detail":"Refresh Token not found."}, status=status.HTTP_401_UNAUTHORIZED,
@@ -122,7 +148,6 @@ class CookieTokenRefreshView(TokenRefreshView):
             key = "access_token",
             value = access_token,
             httponly = True,
-            #secure = False, # Dev
             secure = True,
             samesite = "Lax"
         )
@@ -130,18 +155,24 @@ class CookieTokenRefreshView(TokenRefreshView):
         return response
     
 
+@extend_schema(
+    description="Logout user and delete JWT cookies.",
+    responses={
+        200: OpenApiResponse(description="User logged out successfully."),
+    }
+)
 class LogoutView(APIView):
+    """Logout endpoint, clears JWT cookies."""
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        
+        """Logout user and invalidate tokens."""
         response = Response(
             {"detail": "Log-Out successfully! All Tokens will be deleted. Refresh token is now invalid."},
             status=status.HTTP_200_OK
         )
         
-        # delete cookies
         response.delete_cookie('access_token')
         response.delete_cookie('refresh_token')
 
