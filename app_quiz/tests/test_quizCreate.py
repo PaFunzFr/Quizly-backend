@@ -7,6 +7,12 @@ from contextlib import ExitStack
 
 
 def test_create_quiz_requires_authentication(api_client):
+    """
+    Test that creating a quiz without authentication is forbidden.
+
+    Verifies that:
+    - The response status code is 401 (Unauthorized) when no credentials are provided.
+    """
     url = reverse("create-quiz")
     payload = {"url": "https://www.youtube.com/watch?v=anyId"}
 
@@ -16,6 +22,13 @@ def test_create_quiz_requires_authentication(api_client):
 
 
 def test_create_quiz_invalid_url(auth_client):
+    """
+    Test that creating a quiz with an invalid video URL returns an error.
+
+    Verifies that:
+    - The response status code is 400 (Bad Request).
+    - The response contains an appropriate error message about invalid YouTube URL.
+    """
     url = reverse("create-quiz")
     payload = {"url": "https://example.com/video"}
 
@@ -30,6 +43,18 @@ def test_create_quiz_invalid_url(auth_client):
 
 
 def test_create_quiz_invalid_json(auth_client):
+    """
+    Test handling of invalid JSON returned by the quiz generation AI.
+
+    Mocks:
+    - `download_and_transcribe` to return a fake transcript.
+    - `generateQuiz` to return a non-JSON string.
+
+    Verifies that:
+    - The response status code is 500 (Internal Server Error).
+    - The response contains an error message indicating invalid JSON.
+    - The raw invalid output is included in the response.
+    """
     url = reverse("create-quiz")
     payload = {"url": "https://www.youtube.com/watch?v=validId"}
 
@@ -46,6 +71,18 @@ def test_create_quiz_invalid_json(auth_client):
 
 
 def test_create_quiz_valid_url(auth_client, test_user, quiz_dummy):
+    """
+    Test successful creation of a quiz from a valid YouTube URL.
+
+    Mocks:
+    - `download_and_transcribe` to return a fake transcript.
+    - `generateQuiz` to return a valid quiz JSON string.
+
+    Verifies that:
+    - The response status code is 201 (Created).
+    - A new quiz instance is created in the database for the authenticated user.
+    - The quiz has a title, description, and exactly 10 associated questions.
+    """
     url = reverse("create-quiz")
     payload = {"url": "https://www.youtube.com/watch?v=validId"}
     quiz_dummy_str = json.dumps(quiz_dummy)

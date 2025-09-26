@@ -49,7 +49,26 @@ ydl_opts = {
     'progress_hooks': []
 }
 
+
 def download_and_transcribe(url):
+    """
+    Download audio from a YouTube video and transcribe it to text.
+
+    This function:
+    - Downloads the audio from the provided YouTube URL into a temporary folder.
+    - Uses the Whisper 'tiny' model to transcribe the audio into text.
+    - Deletes the temporary audio file after transcription.
+
+    Args:
+        url (str): The URL of the YouTube video.
+
+    Returns:
+        str: The transcribed text from the video audio.
+
+    Raises:
+        yt_dlp.utils.DownloadError: If the video cannot be downloaded.
+        whisper.WhisperError: If transcription fails.
+    """
 
     # create folder if not existing
     os.makedirs(media_root, exist_ok=True)
@@ -75,10 +94,39 @@ def download_and_transcribe(url):
 
 
 def clean_json(text: str) -> str:
+    """
+    Clean a string containing JSON code blocks.
+
+    Removes Markdown-style code fences (``` or ```json) and trims whitespace.
+
+    Args:
+        text (str): The raw JSON string possibly wrapped in code fences.
+
+    Returns:
+        str: Cleaned JSON string ready for parsing.
+    """
     return re.sub(r"^```(?:json)?|```$", "", text, flags=re.DOTALL).strip()
 
 
 def generateQuiz(transcript):
+    """
+    Generate a quiz in JSON format from a transcript using the Gemini AI model.
+
+    This function:
+    - Sends the transcript and a predefined prompt to the Gemini model.
+    - Receives a raw quiz output from the AI.
+    - Cleans the output to ensure it is valid JSON.
+
+    Args:
+        transcript (str): The text transcript from which to generate the quiz.
+
+    Returns:
+        str: A JSON-formatted string representing the quiz, containing
+            title, description, and exactly 10 questions with options and answers.
+
+    Raises:
+        genai.Error: If content generation fails.
+    """
     response = client.models.generate_content(
         model='gemini-2.5-flash-lite', #'gemini-2.0-flash-001',
         contents=[prompt, transcript]
