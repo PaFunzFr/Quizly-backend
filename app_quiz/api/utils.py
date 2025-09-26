@@ -38,21 +38,25 @@ client = genai.Client(
     http_options=types.HttpOptions(api_version='v1alpha')
 )
 
+# set media folder for yt temp files (/media/temp/)
+media_root = os.path.join(os.getcwd(), "media", "temp")
+
 ydl_opts = {
     'format': 'm4a/bestaudio/best',
     "quiet": True,
     "noplaylist": True,
-    'outtmpl': '%(id)s.%(ext)s', # save file as "VIDEO_ID.m4a"
+    'outtmpl': os.path.join(media_root,'%(id)s.%(ext)s'), # save file as "VIDEO_ID.m4a"
     'progress_hooks': []
-    # 'postprocessors': [{  # Extract audio using ffmpeg
-    #     'key': 'FFmpegExtractAudio',
-    #     'preferredcodec': 'm4a',
-    # }]
 }
 
 def download_and_transcribe(url):
+
+    # create folder if not existing
+    os.makedirs(media_root, exist_ok=True)
+    
     audio_filename = None
     transcript = ""
+    
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
