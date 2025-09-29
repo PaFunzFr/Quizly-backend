@@ -19,6 +19,8 @@ from django.urls import path, include
 
 from app_auth.api.views import RegistrationView, LoginView, CookieTokenRefreshView, LogoutView
 
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -28,9 +30,10 @@ urlpatterns = [
     path('api/logout/', LogoutView.as_view(), name="logout"),
     path('api/token/refresh/', CookieTokenRefreshView.as_view(), name="refresh"),
     
-    path('api/', include('app_quiz.api.urls'))
+    path('api/', include('app_quiz.api.urls')),
 
-    # path('api/createQuiz/', CreateQuizView.as_view(), name=""),
-
-    # path('api/quizzes/', include("app_quiz.api.urls"))
+    # API documentation (including Swagger UI)
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]
