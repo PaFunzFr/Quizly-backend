@@ -78,7 +78,7 @@ def download_and_transcribe(url):
     
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
+            info = ydl.extract_info(url, download=True) #raises yt_dlp.utils.DownloadError
             audio_filename = ydl.prepare_filename(info)
 
             model = whisper.load_model("tiny")

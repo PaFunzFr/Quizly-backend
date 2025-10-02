@@ -1,3 +1,4 @@
+import json
 from rest_framework import views, status
 from rest_framework import generics
 from rest_framework.response import Response
@@ -13,6 +14,23 @@ from app_auth.api.views import CookieJWTAuthentication
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 
+def create_quiz_from_json(user, quiz_json, url):
+    """Creates Quiz and its Questions as Json"""
+    quiz = Quiz.objects.create(
+        owner=user,
+        title=quiz_json.get("title", "No title set")[:80],
+        description=quiz_json.get("description", "No Description set")[:200],
+        video_url=url,
+    )
+
+    for q in quiz_json.get("questions", []):
+        Question.objects.create(
+            quiz=quiz,
+            question_title=q.get("question_title", "")[:200],
+            question_options=q.get("question_options", []),
+            answer=q.get("answer", "")[:200],
+        )
+    return quiz
 
 @extend_schema(
     description="Create a new quiz by providing a video URL. The system downloads, transcribes, and generates quiz questions.",
@@ -32,36 +50,27 @@ class QuizCreateView(views.APIView):
     def post(self, request):
         """Create a quiz by downloading video transcript and generating questions."""
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            url = serializer.validated_data['url']
-            transcript_text = download_and_transcribe(url)
-            quiz_str = generateQuiz(transcript_text)
-
-            import json
-            try:
-                quiz_json = json.loads(quiz_str)
-            except json.JSONDecodeError:
-                return Response(
-                    {"error": "Invalid JSON returned from Gemini", "raw": quiz_str},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-
-            quiz = Quiz.objects.create(
-                owner=request.user,
-                title=quiz_json.get("title", "No title set")[:80],
-                description=quiz_json.get("description", "No Description set")[:200],
-                video_url=url,
-            )
-            for q in quiz_json["questions"]:
-                Question.objects.create(
-                    quiz=quiz,
-                    question_title=q["question_title"][:200],
-                    question_options=q["question_options"],
-                    answer=q["answer"][:200],
-                )
-            return Response(self.serializer_class(quiz).data, status=status.HTTP_201_CREATED)
+        serializer.is_valid(raise_exception=True)
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        url = serializer.validated_data['url']
+        transcript_text = download_and_transcribe(url)
+        quiz_str = generateQuiz(transcript_text)
+
+        try:
+            quiz_json = json.loads(quiz_str)
+        except json.JSONDecodeError:
+            return Response(
+                {"error": "Invalid JSON returned from Gemini", "raw": quiz_str},
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+        except Exception as error:
+            return Response(
+                {"error": "Unexpected Error while creating Quiz", "details": str(error)},
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+
+        quiz = create_quiz_from_json(request.user, quiz_json, url)
+        return Response(self.serializer_class(quiz).data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(
