@@ -143,7 +143,7 @@ This will also pre-load the Whisper tiny model.
 
 ```docker-compose up --build```
 
-The backend will be exposed on http://localhost:8000.
+The backend will be exposed on http://localhost:8001.
 Source code is mounted to /usr/src/app for live updates.
 
 ---
@@ -185,9 +185,9 @@ Swagger/OpenAPI documentation is automatically generated using drf-spectacular.
 
 Once the server is running, you can access it at:
 
-http://localhost:8000/schema/
-http://localhost:8000/swagger/
-http://localhost:8000/redoc/
+http://localhost:8001/schema/
+http://localhost:8001/swagger/
+http://localhost:8001/redoc/
 
 ---
 

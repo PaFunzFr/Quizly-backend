@@ -6,6 +6,8 @@ from google import genai
 from google.genai import types
 from decouple import config
 
+cookies_path = os.getenv("YTDLP_COOKIES_PATH", "/usr/src/app/cookies.txt")
+
 prompt = """Based on the following transcript, generate a quiz in valid JSON format.
 
 The quiz must follow this exact structure:
@@ -41,12 +43,24 @@ client = genai.Client(
 # set media folder for yt temp files (/media/temp/)
 media_root = os.path.join(os.getcwd(), "media", "temp")
 
+useragent = os.getenv("YTDLP_UA", 
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/124.0.0.0 Safari/537.36"
+)
+
 ydl_opts = {
     'format': 'm4a/bestaudio/best',
     "quiet": True,
     "noplaylist": True,
     'outtmpl': os.path.join(media_root,'%(id)s.%(ext)s'), # save file as "VIDEO_ID.m4a"
-    'progress_hooks': []
+    'progress_hooks': [],
+    'http_headers': {
+        'User-Agent': useragent,
+        'Accept-Language': 'en-US,en;q=0.8',
+        'Accept': '*/*',
+        'Referer': 'https://www.youtube.com/',
+    },
 }
 
 
@@ -75,6 +89,9 @@ def download_and_transcribe(url):
     
     audio_filename = None
     transcript = ""
+
+    if not config('DEBUG'):
+        ydl_opts["cookies"] = cookies_path
     
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:

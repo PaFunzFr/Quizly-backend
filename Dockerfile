@@ -18,4 +18,7 @@ RUN python -c "import whisper; whisper.load_model('tiny')"
 # copy all
 COPY . . 
 
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"] 
+EXPOSE 8001
+
+CMD sh -c "python manage.py migrate --noinput && \
+           gunicorn core.wsgi:application --bind 0.0.0.0:8001 --workers 3 --threads 2  --timeout 1800"

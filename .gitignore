@@ -45,6 +45,7 @@ venv/
 .env/
 .venv/
 env/
+cookies.txt
 
 # Django database (SQLite)
 *.sqlite3
