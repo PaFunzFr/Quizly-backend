@@ -3,7 +3,7 @@ FROM python:3.11-slim
 
 # install FFmpeg
 RUN apt-get update && apt-get install -y ffmpeg
-RUN mkdir -p /usr/src/app/staticfiles
+
 
 # install folder of image
 WORKDIR /usr/src/app
@@ -19,8 +19,13 @@ RUN python -c "import whisper; whisper.load_model('tiny')"
 # copy all
 COPY . . 
 
+RUN mkdir -p /usr/src/app/staticfiles && \
+    chown -R www-data:www-data /usr/src/app/staticfiles
+
 EXPOSE 8001
 
+# run migrations, collectstatic and start gunicorn as www-data
+USER www-data
 CMD sh -c "python manage.py migrate --noinput && \
             python manage.py collectstatic --noinput && \
             gunicorn core.wsgi:application --bind 0.0.0.0:8001 --workers 3 --threads 2  --timeout 1800"
