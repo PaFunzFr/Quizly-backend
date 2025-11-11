@@ -17,7 +17,6 @@ from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,23 +26,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = config('DEBUG', default=False, cast=bool)
-
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:4200',
-    'http://127.0.0.1:4200',
-    'http://127.0.0.1:5500',
-    'http://127.0.0.1:5501',
-]
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:4200',
-    'http://127.0.0.1:4200',
-    'http://127.0.0.1:5500',
-    'http://127.0.0.1:5501',
-]
+ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS', default='localhost').split(',')]
+CSRF_TRUSTED_ORIGINS = [h.strip() for h in config('CSRF_TRUSTED_ORIGINS', default='http://localhost').split(',')]
+CORS_ALLOWED_ORIGINS = [h.strip() for h in config('CORS_ALLOWED_ORIGINS', default='http://localhost').split(',')]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -143,7 +130,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -160,6 +148,6 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=400),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }  
