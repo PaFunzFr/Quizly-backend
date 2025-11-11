@@ -8,7 +8,7 @@ certifi==2025.8.3
 charset-normalizer==3.4.3
 coloredlogs==15.0.1
 coverage==7.10.7
-ctranslate2==4.6.0
+ctranslate2==4.6.1
 Django==5.2.6
 django-cors-headers==4.9.0
 djangorestframework==3.16.1
@@ -73,4 +73,4 @@ typing_extensions==4.15.0
 uritemplate==4.2.0
 urllib3==2.5.0
 websockets==15.0.1
-yt-dlp==2025.9.23
+yt-dlp==2025.9.26
