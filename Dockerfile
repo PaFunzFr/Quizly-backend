@@ -3,6 +3,7 @@ FROM python:3.11-slim
 
 # install FFmpeg
 RUN apt-get update && apt-get install -y ffmpeg
+RUN mkdir -p /usr/src/app/staticfiles
 
 # install folder of image
 WORKDIR /usr/src/app
