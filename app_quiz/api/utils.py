@@ -5,8 +5,26 @@ import whisper
 from google import genai
 from google.genai import types
 from decouple import config
+import tempfile
 
-cookies_path = os.getenv("YTDLP_COOKIES_PATH", "/usr/src/app/cookies.txt")
+cookies_env = {
+    "SID": os.getenv("YOUTUBE_SID"),
+    "HSID": os.getenv("YOUTUBE_HSID"),
+    "SSID": os.getenv("YOUTUBE_SSID"),
+    "SAPISID": os.getenv("YOUTUBE_SAPISID"),
+    "APISID": os.getenv("YOUTUBE_APISID"),
+    "LOGIN_INFO": os.getenv("YOUTUBE_LOGININFO"),
+}
+
+with tempfile.NamedTemporaryFile(mode="w+", suffix=".txt", delete=False) as tmp_cookie_file:
+    tmp_cookie_path = tmp_cookie_file.name
+    tmp_cookie_file.write("# Netscape HTTP Cookie File\n")
+    
+    for name, value in cookies_env.items():
+        if value:
+            tmp_cookie_file.write(f".youtube.com\tTRUE\t/\tTRUE\t0\t{name}\t{value}\n")
+
+print("Temporary cookie file created:", tmp_cookie_path)
 
 prompt = """Based on the following transcript, generate a quiz in valid JSON format.
 
@@ -60,6 +78,7 @@ ydl_opts = {
         'Accept-Language': 'en-US,en;q=0.8',
         'Accept': '*/*',
         'Referer': 'https://www.youtube.com/',
+        'Origin': 'https://www.youtube.com'
     },
 }
 
@@ -91,7 +110,7 @@ def download_and_transcribe(url):
     transcript = ""
 
     if not config('DEBUG'):
-        ydl_opts["cookies"] = cookies_path
+        ydl_opts["cookies"] = tmp_cookie_path
     
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
