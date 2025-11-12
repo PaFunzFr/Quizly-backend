@@ -4,11 +4,12 @@ set -e
 echo "[entrypoint] Running Django setup..."
 
 # ---- ensure /app exists ----
-mkdir -p /app
+COOKIE_DIR=$(dirname "$COOKIE_PATH")
+mkdir -p "$COOKIE_DIR"
 
 # ---- Create YouTube cookies file ----
-COOKIE_FILE="/app/cookies.txt"
-echo "# Netscape HTTP Cookie File" > "$COOKIE_FILE"
+
+echo "# Netscape HTTP Cookie File" > "$COOKIE_PATH"
 
 # Environment variable names
 COOKIE_NAMES="YOUTUBE_SID YOUTUBE_HSID YOUTUBE_SSID YOUTUBE_SAPISID YOUTUBE_APISID YOUTUBE_LOGININFO"
@@ -16,12 +17,12 @@ COOKIE_NAMES="YOUTUBE_SID YOUTUBE_HSID YOUTUBE_SSID YOUTUBE_SAPISID YOUTUBE_APIS
 for NAME in $COOKIE_NAMES; do
     VALUE=$(printenv "$NAME" || true)
     if [ -n "$VALUE" ]; then
-        echo ".youtube.com	TRUE	/	TRUE	0	$NAME	$VALUE" >> "$COOKIE_FILE"
+        echo ".youtube.com	TRUE	/	TRUE	0	$NAME	$VALUE" >> "$COOKIE_PATH"
     fi
 done
 
-echo "[entrypoint] Cookies file created at $COOKIE_FILE"
-cat "$COOKIE_FILE"
+echo "[entrypoint] Cookies file created at $COOKIE_PATH"
+cat "$COOKIE_PATH"
 
 # ---- collect staticfiles and migrate db ----
 python manage.py collectstatic --noinput
