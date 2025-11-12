@@ -110,7 +110,7 @@ def download_and_transcribe(url):
     transcript = ""
 
     if not config('DEBUG'):
-        ydl_opts["cookies"] = tmp_cookie_path
+        ydl_opts['cookies'] = "/app/cookies.txt"
     
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
