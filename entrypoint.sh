@@ -3,26 +3,19 @@ set -e
 
 echo "[entrypoint] Running Django setup..."
 
-# ---- ensure /app exists ----
-COOKIE_DIR=$(dirname "$COOKIE_PATH")
-mkdir -p "$COOKIE_DIR"
+if [ "$DEBUG" = "False" ]; then
+    echo "[entrypoint] Production mode: Erstelle cookies.txt ..."
+    
+    COOKIE_DIR=$(dirname "$COOKIE_PATH")
+    mkdir -p "$COOKIE_DIR"
 
-# ---- Create YouTube cookies file ----
+    echo -e "$YT_COOKIES" > "$COOKIE_PATH"
 
-echo "# Netscape HTTP Cookie File" > "$COOKIE_PATH"
-
-# Environment variable names
-COOKIE_NAMES="YOUTUBE_SID YOUTUBE_HSID YOUTUBE_SSID YOUTUBE_SAPISID YOUTUBE_APISID YOUTUBE_LOGININFO"
-
-for NAME in $COOKIE_NAMES; do
-    VALUE=$(printenv "$NAME" || true)
-    if [ -n "$VALUE" ]; then
-        echo ".youtube.com	TRUE	/	TRUE	0	$NAME	$VALUE" >> "$COOKIE_PATH"
-    fi
-done
-
-echo "[entrypoint] Cookies file created at $COOKIE_PATH"
-cat "$COOKIE_PATH"
+    echo "[entrypoint] Cookies file created at $COOKIE_PATH"
+    cat "$COOKIE_PATH"
+else
+    echo "[entrypoint] DEBUG-Modus: cookies.txt wird nicht erstellt."
+fi
 
 # ---- collect staticfiles and migrate db ----
 python manage.py collectstatic --noinput
