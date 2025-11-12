@@ -92,7 +92,7 @@ class LoginView(TokenObtainPairView):
             value = str(access),
             httponly = True,
             secure = True,
-            samesite = "Lax"
+            samesite = "None"
         )
 
         response.set_cookie(
@@ -100,7 +100,7 @@ class LoginView(TokenObtainPairView):
             value = str(refresh),
             httponly = True,
             secure = True,
-            samesite = "Lax"
+            samesite = "None"
         )
 
         return response
@@ -149,7 +149,7 @@ class CookieTokenRefreshView(TokenRefreshView):
             value = access_token,
             httponly = True,
             secure = True,
-            samesite = "Lax"
+            samesite = "None"
         )
 
         return response
